@@ -6,9 +6,13 @@ services:
 
     volumes:
       - ./postgres_data:/var/lib/postgresql
+    networks:
+      - sciadro_bridge
 
   rabbit-mq:
     image: rabbitmq:3.7
+    networks:
+      - sciadro_bridge
 
   api:
     build: ./api
@@ -23,6 +27,8 @@ services:
     environment:
       DEBUG: 0
       WAIT_HOSTS: db:5432, rabbit-mq:5672
+    networks:
+      - sciadro_bridge
 
   nginx:
     build: ./nginx
@@ -33,12 +39,21 @@ services:
     volumes:
       - static_volume:/code/static
       - media_volume:/code/data
+    networks:
+       - sciadro_bridge
 
   frontend:
     image: geosolutionsit/mapstore2:SCIADRO-2019.01.01
+    networks:
+      - sciadro_bridge
 
 volumes:
   static_volume:
   media_volume:
 
 
+networks:
+    sciadro_bridge:
+        driver: bridge
+        driver_opts:
+            com.docker.network.bridge.name: sciadro-bridge
